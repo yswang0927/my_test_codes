@@ -65,7 +65,7 @@ public class WeightedRoundRobinLoadBalancer {
                 // First, check server health
                 if (currentServer.isDownState) {
                     long now = Instant.now().getEpochSecond();
-                    if ((now - currentServer.checkedTimestamp) > currentServer.failTimeoutSeconds) {
+                    if ((now - currentServer.checkedTimestamp) > currentServer.failTimeoutMillis/1000) {
                         currentServer.isDownState = false;
                         currentServer.fails = 0;
                         //System.out.printf("✅ Server %s is back up.%n", currentServer.address);
@@ -120,7 +120,7 @@ public class WeightedRoundRobinLoadBalancer {
             // Health check for dynamic 'down' state (due to failures)
             if (currentServer.isDownState) {
                 long now = Instant.now().getEpochSecond();
-                if ((now - currentServer.checkedTimestamp) > currentServer.failTimeoutSeconds) {
+                if ((now - currentServer.checkedTimestamp) > currentServer.failTimeoutMillis/1000) {
                     currentServer.isDownState = false;
                     currentServer.fails = 0;
                     System.out.printf("✅ Server %s is back up.%n", currentServer.toString());
@@ -147,13 +147,13 @@ public class WeightedRoundRobinLoadBalancer {
 
     public void reportConnectionOpened(ServerNode server) {
         if (server != null) {
-            server.conns++;
+            server.conns.incrementAndGet();
         }
     }
 
     public void reportConnectionClosed(ServerNode server) {
         if (server != null) {
-            server.conns--;
+            server.conns.decrementAndGet();
         }
     }
 
@@ -174,7 +174,7 @@ public class WeightedRoundRobinLoadBalancer {
                 server.isDownState = true;
                 server.checkedTimestamp = Instant.now().getEpochSecond(); // Mark the time it went down
                 System.out.printf("🛑 Server %s is down (fails=%d). Will check again in %d seconds.%n",
-                        server.endpoint, server.fails, server.failTimeoutSeconds);
+                        server.endpoint, server.fails, server.failTimeoutMillis/1000);
             }
         } finally {
             lock.unlock();

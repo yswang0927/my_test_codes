@@ -3,12 +3,12 @@ package loadbalancer;
 public class Test2 {
 
     public static void main(String[] args) {
-        WeightedRoundRobbinServerGroup serverGroup = new WeightedRoundRobbinServerGroup();
+        WeightedRoundRobbinServerGroup2 serverGroup = new WeightedRoundRobbinServerGroup2();
 
         // 添加主服务器
-        serverGroup.addServer(new ServerNode("server1.example.com", 5, 0, 1, 10, false, false));
-        serverGroup.addServer(new ServerNode("server2.example.com", 2, 0, 1, 10, false, false));
-        serverGroup.addServer(new ServerNode("backup.example.com", 2, 0, 1, 10, true, false));
+        serverGroup.addServer(new ServerNode("server1.example.com", 5, 1, 1, 0, false, false));
+        serverGroup.addServer(new ServerNode("server2.example.com", 2, 1, 1, 0, false, false));
+        serverGroup.addServer(new ServerNode("backup.example.com", 2, 1, 1, 0, true, false));
 
         // 模拟请求，选择服务器
         for (int i = 1; i <= 10; i++) {
@@ -22,7 +22,7 @@ public class Test2 {
 
                     // 模拟处理时间
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(500);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
